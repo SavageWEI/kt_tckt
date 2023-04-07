@@ -115,27 +115,27 @@ class TCKTNet(nn.Module):
         attention_out, _ = self.multi_attention_is(query_in, key_in, value_in, attn_mask=attention_mask)
         attention_out = self.layer_norm1_is(attention_out + query_in)
         attention_out = attention_out.permute(1, 0, 2)
-        #
-        # # CS-sampling
-        # global_learning = torch.load('./center_learning_2000.pt').to(device)
-        # global_learning = torch.unsqueeze(global_learning, 0)
-        # MC = global_learning.repeat(batch_size, 1, 1)
-        # MC = MC.permute(1, 0, 2)
-        # # Q' K' V'
-        # query_in_hat = all_learning_att_in
-        # key_in_hat = MC
-        # value_in_hat = MC
-        #
-        # value_in_hat = self.linear_cs[0](value_in_hat).to(device)
-        # key_in_hat = self.linear_cs[1](key_in_hat).to(device)
-        # query_in_hat = self.linear_cs[2](query_in_hat).to(device)
-        #
-        # attention_mask = torch.from_numpy(np.triu(np.ones((seq_len, 2000)), k=1).astype("bool")).to(device)
-        # attention_out_hat, _ = self.multi_attention_cs(query_in_hat, key_in_hat, value_in_hat, attn_mask=attention_mask)
-        # attention_out_hat = self.layer_norm1_cs(attention_out_hat + query_in_hat)
-        # attention_out_hat = attention_out_hat.permute(1, 0, 2)
-        #
-        # attention_out = self.fc_att_cs_is(torch.cat([attention_out, attention_out_hat], dim=2))
+        
+        # CS-sampling
+        global_learning = torch.load('./center_learning_2000.pt').to(device)
+        global_learning = torch.unsqueeze(global_learning, 0)
+        MC = global_learning.repeat(batch_size, 1, 1)
+        MC = MC.permute(1, 0, 2)
+        # Q' K' V'
+        query_in_hat = all_learning_att_in
+        key_in_hat = MC
+        value_in_hat = MC
+        
+        value_in_hat = self.linear_cs[0](value_in_hat).to(device)
+        key_in_hat = self.linear_cs[1](key_in_hat).to(device)
+        query_in_hat = self.linear_cs[2](query_in_hat).to(device)
+        
+        attention_mask = torch.from_numpy(np.triu(np.ones((seq_len, 2000)), k=1).astype("bool")).to(device)
+        attention_out_hat, _ = self.multi_attention_cs(query_in_hat, key_in_hat, value_in_hat, attn_mask=attention_mask)
+        attention_out_hat = self.layer_norm1_cs(attention_out_hat + query_in_hat)
+        attention_out_hat = attention_out_hat.permute(1, 0, 2)
+        
+        attention_out = self.fc_att_cs_is(torch.cat([attention_out, attention_out_hat], dim=2))
         #
         all_learning = attention_out
 
